@@ -1,35 +1,56 @@
-import React from "react";
-import {useDispatch, useSelector, shallowEqual} from "react-redux";
-import {decrease, increase, setDiff} from "../modules/counter";
-import Counter from "../components/Counter";
+import React from 'react';
+import {bindActionCreators} from "redux";
+import {connect} from 'react-redux';
+import Counter from '../components/Counter';
+import {increase, decrease, setDiff} from '../modules/counter';
 
-function CounterContainer() {
-    const {number, diff} = useSelector(state => ({
-            number: state.counter.number,
-            diff: state.counter.diff
-        }),
-        // (left, right) => {
-        //     return left.diff === right.diff && left.number === right.number;
-        // }
-        shallowEqual
-    );
-    // const number = useSelector(state => state.counter.number);
-    // const diff = useSelector(state => state.counter.diff);
-    const dispatch = useDispatch();
-
-    const onIncrease = () => dispatch(increase());
-    const onDecrease = () => dispatch(decrease());
-    const onSetDiff = diff => dispatch(setDiff(diff));
-
+function CounterContainer2({number, diff, increase, decrease, setDiff}) {
     return (
         <Counter
+            // 상태와
             number={number}
             diff={diff}
-            onIncrease={onIncrease}
-            onDecrease={onDecrease}
-            onSetDiff={onSetDiff}
+            // 액션을 디스패치 하는 함수들을 props로 넣어줍니다.
+            onIncrease={increase}
+            onDecrease={decrease}
+            onSetDiff={setDiff}
         />
     );
 }
 
-export default CounterContainer;
+// mapStateToProps 는 리덕스 스토어의 상태를 조회해서 어떤 것들을 props 로 넣어줄지 정의합니다.
+// 현재 리덕스 상태를 파라미터로 받아옵니다.
+const mapStateToProps = state => ({
+    number: state.counter.number,
+    diff: state.counter.diff
+});
+
+// mapDispatchToProps 는 액션을 디스패치하는 함수를 만들어서 props로 넣어줍니다.
+// dispatch 를 파라미터로 받아옵니다.
+// const mapDispatchToProps = dispatch => bindActionCreators({
+//     increase,
+//     decrease,
+//     setDiff
+// }, dispatch)
+// // ({
+// //     // onIncrease: () => dispatch(increase()),
+// //     // onDecrease: () => dispatch(decrease()),
+// //     // onSetDiff: diff => dispatch(setDiff(diff))
+// // });
+
+const mapDispatchToProps = {
+    increase,
+    decrease,
+    setDiff,
+};
+
+// connect 함수에는 mapStateToProps, mapDispatchToProps 를 인자로 넣어주세요.
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CounterContainer2);
+
+/* 위 코드는 다음과 동일합니다.
+  const enhance = connect(mapStateToProps, mapDispatchToProps);
+  export defualt enhance(CounterContainer);
+*/
